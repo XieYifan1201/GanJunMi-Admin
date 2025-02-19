@@ -179,11 +179,13 @@ export default {
         'page': page,
         'pageSize': this.pageSize,
         'trainsClassId': this.trainsId,
-        'state': 2
+        'state': 2,
+        'areaReverse': true,
+        'unitReverse': true
       }).then(res => {
         this.listLoading = false
         this.list = res.data.records.filter(item => item.certificate)
-        this.total = this.list.length
+        this.total = res.data.total
       })
     },
     // 切换页
