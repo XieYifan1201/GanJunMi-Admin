@@ -1,3 +1,4 @@
+// 全局 getters，用于跨模块快速访问状态
 const getters = {
   sidebar: state => state.app.sidebar,
   device: state => state.app.device,

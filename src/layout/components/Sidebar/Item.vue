@@ -17,10 +17,12 @@ export default {
     const vnodes = []
 
     if (icon) {
+      // Element UI 内置图标
       if (icon.includes('el-icon')) {
         vnodes.push(<i class={[icon, 'sub-el-icon']} />)
       } else {
-        vnodes.push(<svg-icon icon-class={icon}/>)
+        // 自定义 SVG 图标
+        vnodes.push(<svg-icon icon-class={icon} />)
       }
     }
 

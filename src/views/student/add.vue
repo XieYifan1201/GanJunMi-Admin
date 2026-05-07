@@ -1,14 +1,15 @@
 <template>
   <div class="app-container">
+    <!-- 步骤条 -->
     <el-steps :active="active" simple finish-status="success" style="margin-bottom: 20px; background-color: #C7EDCC;">
       <el-step title="学员信息录入" />
       <el-step title="学员报名培训" />
       <el-step title="学员开票信息" />
     </el-steps>
-    <!-- 学员信息录入 -->
+
+    <!-- 第一步：学员信息录入 -->
     <el-form v-if="active === 0" ref="form" :model="form" :rules="formRules" class="form">
       <div class="form-grid">
-        <!-- 第一列 -->
         <div class="form-column">
           <el-form-item label="姓名" prop="name">
             <el-input v-model="form.name" autocomplete="off" placeholder="请输入姓名" />
@@ -20,7 +21,6 @@
             <el-input v-model="form.phone" autocomplete="off" placeholder="请输入手机号码" />
           </el-form-item>
         </div>
-        <!-- 第二列 -->
         <div class="form-column">
           <el-form-item label="城市" prop="city">
             <br>
@@ -48,7 +48,6 @@
             <el-input v-model="form.address" autocomplete="off" placeholder="请输入详细地址" />
           </el-form-item>
         </div>
-        <!-- 第三列 -->
         <div class="form-column">
           <el-form-item label="性别" style="margin-top: 40px;">
             <el-radio v-model="form.sex" label="男">男</el-radio>
@@ -58,7 +57,6 @@
             <el-input v-model="form.workUnit" autocomplete="off" placeholder="请输入工作单位" />
           </el-form-item>
         </div>
-        <!-- 第四列 -->
         <div class="form-column">
           <el-form-item label="证件照" prop="image">
             <el-upload
@@ -79,7 +77,8 @@
         <el-button type="primary" @click="submitForm('form')">保存</el-button>
       </div>
     </el-form>
-    <!-- 学员报名培训 -->
+
+    <!-- 第二步：学员报名培训 -->
     <el-form v-if="active === 1" ref="form2" :model="form2" :rules="formRules2" class="form">
       <el-form-item label="姓名">
         {{ form2.name }}
@@ -120,8 +119,10 @@
         <el-button type="primary" @click="submitForm('form2')">保存</el-button>
       </div>
     </el-form>
-    <!-- 学员开票信息 -->
+
+    <!-- 第三步：学员开票信息 -->
     <div v-if="active === 2">
+      <!-- 增值税专用发票 -->
       <el-form v-if="special === '1'" ref="form3" :model="form3" :rules="formRules3">
         <el-form-item label="发票类型">
           <el-radio v-model="special" label="1">增值税专用发票</el-radio>
@@ -150,6 +151,7 @@
           <el-button type="primary" @click="submitForm('form3')">保存</el-button>
         </div>
       </el-form>
+      <!-- 普通发票 -->
       <el-form v-else ref="form3" :model="form3" :rules="formRules4">
         <el-form-item label="发票类型">
           <el-radio v-model="special" label="1">增值税专用发票</el-radio>
@@ -167,7 +169,8 @@
         </div>
       </el-form>
     </div>
-    <!-- 表格 -->
+
+    <!-- 已录入学员列表 -->
     <el-table
       v-loading="listLoading"
       class="table"
@@ -265,6 +268,8 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 分页 -->
     <el-pagination
       background
       style="margin-top: 20px;"
@@ -275,7 +280,8 @@
       @current-change="handlePageChange"
       @size-change="handleSizeChange"
     />
-    <!-- 证件照 -->
+
+    <!-- 证件照弹窗 -->
     <el-dialog title="证件照" :visible.sync="dialogVisible1" width="20%">
       <img :src="img" alt="img" style="width: 100%;">
     </el-dialog>
@@ -291,25 +297,28 @@ import cloneDeep from 'lodash/cloneDeep'
 export default {
   data() {
     return {
+      // 回执单文件列表
       fileList: [],
+      // 当前步骤（0:信息录入, 1:报名培训, 2:开票信息）
       active: 0,
-      // 上传图片token
+      // 上传请求头，携带token鉴权
       header: { 'token': getToken() },
-      // 加载
+      // 列表加载状态
       listLoading: false,
-      // 表格
+      // 学员列表数据
       list: [],
       total: 0,
       pageSize: 10,
-      // 证件照显示
+      // 证件照弹窗
       dialogVisible1: false,
       img: '',
-      // 地区显示
+      // 地区选择
       city: '',
       district: '',
-      // 是否修改
+      // 是否为编辑模式
       isEdit: false,
-      // 学员信息录入
+
+      // ---- 第一步：学员基本信息 ----
       form: {
         name: '',
         idCard: '',
@@ -349,7 +358,8 @@ export default {
           { required: true, message: '请选择区县', trigger: 'blur' }
         ]
       },
-      // 学员报名培训
+
+      // ---- 第二步：报名培训 ----
       trainsOptions: [],
       classOptions: [],
       form2: {},
@@ -365,11 +375,14 @@ export default {
         ]
       },
       trainsClassId: null,
-      // 学员开票信息
+
+      // ---- 第三步：开票信息 ----
+      // 发票类型：1=增值税专用发票，2=普通发票
       special: '1',
       form3: {
         special: true
       },
+      // 专用发票校验规则
       formRules3: {
         invoiceHead: [
           { required: true, message: '请选择期数', trigger: 'blur' }
@@ -390,6 +403,7 @@ export default {
           { required: true, message: '请输入公司电话', trigger: 'blur' }
         ]
       },
+      // 普通发票校验规则
       formRules4: {
         invoiceHead: [
           { required: true, message: '请选择期数', trigger: 'blur' }
@@ -398,52 +412,20 @@ export default {
           { required: true, message: '请输入税号', trigger: 'blur' }
         ]
       },
-      // 城市选择数据
+
+      // ---- 城市/区县数据 ----
       CityOptions: [
-        {
-          value: '南昌市',
-          label: '南昌市'
-        },
-        {
-          value: '九江市',
-          label: '九江市'
-        },
-        {
-          value: '上饶市',
-          label: '上饶市'
-        },
-        {
-          value: '抚州市',
-          label: '抚州市'
-        },
-        {
-          value: '宜春市',
-          label: '宜春市'
-        },
-        {
-          value: '吉安市',
-          label: '吉安市'
-        },
-        {
-          value: '赣州市',
-          label: '赣州市'
-        },
-        {
-          value: '景德镇市',
-          label: '景德镇市'
-        },
-        {
-          value: '萍乡市',
-          label: '萍乡市'
-        },
-        {
-          value: '新余市',
-          label: '新余市'
-        },
-        {
-          value: '鹰潭市',
-          label: '鹰潭市'
-        }
+        { value: '南昌市', label: '南昌市' },
+        { value: '九江市', label: '九江市' },
+        { value: '上饶市', label: '上饶市' },
+        { value: '抚州市', label: '抚州市' },
+        { value: '宜春市', label: '宜春市' },
+        { value: '吉安市', label: '吉安市' },
+        { value: '赣州市', label: '赣州市' },
+        { value: '景德镇市', label: '景德镇市' },
+        { value: '萍乡市', label: '萍乡市' },
+        { value: '新余市', label: '新余市' },
+        { value: '鹰潭市', label: '鹰潭市' }
       ],
       districtsOption: {
         '': [{ value: '请选择城市', label: '请选择城市' }],
@@ -577,7 +559,7 @@ export default {
     this.getPhase()
   },
   methods: {
-    // 上传证件照
+    // 证件照上传成功回调
     handleAvatarSuccess(res, file) {
       if (res.code === 0) {
         this.$message({
@@ -587,15 +569,18 @@ export default {
       }
       this.form.image = res.data
     },
-    // 上传回执单
+
+    // 回执单上传成功回调
     handleFileSuccess(res, file) {
       this.form2.receiptPath = res.data
     },
-    // 重置弹窗表单
+
+    // 重置表单
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    // 上传表单
+
+    // 提交表单，根据步骤和编辑模式走不同接口
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -605,10 +590,7 @@ export default {
             window.scrollTo(0, 0)
             if (this.isEdit) {
               editStuList(formData).then(res => {
-                this.$message({
-                  type: 'success',
-                  message: '保存成功!'
-                })
+                this.$message({ type: 'success', message: '保存成功!' })
                 this.form = {}
                 this.fetchData()
                 this.resetForm(formName)
@@ -617,10 +599,7 @@ export default {
               this.form2 = this.form
               this.form3.idCard = this.form.idCard
               addStuList(formData).then(res => {
-                this.$message({
-                  type: 'success',
-                  message: '保存成功!'
-                })
+                this.$message({ type: 'success', message: '保存成功!' })
                 this.form = {}
                 this.fetchData()
                 this.resetForm(formName)
@@ -632,10 +611,7 @@ export default {
               regStu(formData).then(res => {
                 this.next()
                 window.scrollTo(0, 0)
-                this.$message({
-                  type: 'success',
-                  message: '保存成功!'
-                })
+                this.$message({ type: 'success', message: '保存成功!' })
                 this.form2 = {}
                 this.fetchData()
                 this.resetForm(formName)
@@ -644,10 +620,7 @@ export default {
               regStu2(formData).then(res => {
                 this.next()
                 window.scrollTo(0, 0)
-                this.$message({
-                  type: 'success',
-                  message: '保存成功!'
-                })
+                this.$message({ type: 'success', message: '保存成功!' })
                 this.form2 = {}
                 this.fetchData()
                 this.resetForm(formName)
@@ -660,10 +633,7 @@ export default {
             editInvoice(formData).then(res => {
               this.active = 0
               window.scrollTo(0, 0)
-              this.$message({
-                type: 'success',
-                message: '保存成功!'
-              })
+              this.$message({ type: 'success', message: '保存成功!' })
               this.add()
             })
           }
@@ -672,29 +642,39 @@ export default {
         }
       })
     },
+
+    // 同步期数选择到表单
     updataTrains() {
       this.form2.trainsClassId = this.trainsClassId
       this.form2.trainClassId = this.trainsClassId
     },
+
+    // 同步城市选择到表单
     updataCity() {
       this.form.city = this.city
     },
+
+    // 同步区县选择到表单
     updataDistrict() {
       this.form.district = this.district
     },
-    // 返回
+
+    // 返回第一步
     back() {
       this.add()
     },
-    // 跳过
+
+    // 步骤+1
     next() {
       this.active += 1
     },
-    // 添加新学员
+
+    // 重置页面，开始新增学员
     add() {
       location.reload()
     },
-    // 删除学院
+
+    // 删除学员
     del(id, name) {
       this.$confirm(`此操作将永久删除${name}, 是否继续?`, '警告', {
         confirmButtonText: '确定',
@@ -702,22 +682,26 @@ export default {
         type: 'warning'
       }).then(() => {
         delStuList({ id: id }).then(res => {
-          this.$message({
-            type: 'success',
-            message: '删除成功'
-          })
+          this.$message({ type: 'success', message: '删除成功' })
           this.fetchData()
         })
       })
     },
-    // 开启弹窗
+
+    // 打开证件照弹窗
     openDialog(dialog, data) {
       if (dialog === 'dialog1') {
         this.img = data
         this.dialogVisible1 = true
       }
     },
-    // 分页查询
+
+    // 下载回执单
+    download(url) {
+      window.open(url)
+    },
+
+    // 分页查询学员列表
     fetchData(page = 1) {
       this.listLoading = true
       getStuList2({
@@ -730,15 +714,19 @@ export default {
         this.listLoading = false
       })
     },
-    // 切换页
+
+    // 翻页
     handlePageChange(page) {
       this.fetchData(page)
     },
+
+    // 切换每页条数
     handleSizeChange(pageSize) {
       this.pageSize = pageSize
       this.fetchData()
     },
-    // 编辑
+
+    // 进入编辑模式，回填表单数据
     edit(data) {
       this.active = 0
       this.isEdit = true
@@ -757,7 +745,8 @@ export default {
       this.form3 = cloneDeep(data)
       this.getClass()
     },
-    // 查询期次
+
+    // 获取培训列表，填充下拉选项
     getPhase() {
       this.trainsOptions = []
       getPhaseList({
@@ -770,7 +759,8 @@ export default {
         })
       })
     },
-    // 报名查询班次
+
+    // 根据培训ID获取班次列表
     getClass() {
       if (this.form2.trainsId) {
         this.classOptions = []
@@ -799,6 +789,7 @@ export default {
 .dialog-footer {
   text-align: right;
 }
+
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -806,9 +797,11 @@ export default {
   position: relative;
   overflow: hidden;
 }
+
 .avatar-uploader .el-upload:hover {
   border-color: #409EFF;
 }
+
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
@@ -817,51 +810,34 @@ export default {
   line-height: 250px;
   text-align: center;
 }
+
 .avatar {
   width: 180px;
   height: 250px;
   display: block;
 }
+
 .form {
   margin: 0 auto;
   width: 75%;
 }
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 20px;
 }
+
 .form-column {
   display: flex;
   flex-direction: column;
 }
+
 .form-column .el-form-item {
   margin-bottom: 20px;
 }
+
 .form-column .el-form-item:last-child {
   margin-bottom: 0;
-}
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409EFF;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 180px;
-  height: 250px;
-  line-height: 250px;
-  text-align: center;
-}
-.avatar {
-  width: 180px;
-  height: 250px;
-  display: block;
 }
 </style>

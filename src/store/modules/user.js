@@ -28,7 +28,7 @@ const mutations = {
 }
 
 const actions = {
-  // 用户登录
+  // 用户登录，提交凭证并存储 token
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
@@ -43,7 +43,7 @@ const actions = {
     })
   },
 
-  // 获取用户信息
+  // 获取当前登录用户信息
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
@@ -54,7 +54,6 @@ const actions = {
         }
 
         const { name, image } = data
-
         commit('SET_NAME', name)
         commit('SET_AVATAR', image)
         resolve(data)
@@ -64,20 +63,20 @@ const actions = {
     })
   },
 
-  // 登出
+  // 退出登录，清除本地凭证和路由
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      removeToken() // 删除token
+      removeToken()
       resetRouter()
       commit('RESET_STATE')
       resolve()
     })
   },
 
-  // remove token
+  // 重置 token，用于 token 失效时清理状态
   resetToken({ commit }) {
     return new Promise(resolve => {
-      removeToken() // must remove  token  first
+      removeToken()
       commit('RESET_STATE')
       resolve()
     })
@@ -90,4 +89,3 @@ export default {
   mutations,
   actions
 }
-

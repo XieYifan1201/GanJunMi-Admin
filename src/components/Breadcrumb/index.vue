@@ -27,11 +27,12 @@ export default {
     this.getBreadcrumb()
   },
   methods: {
+    // 根据当前路由生成面包屑层级
     getBreadcrumb() {
-      // only show routes with meta.title
       let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
       const first = matched[0]
 
+      // 首页不在匹配结果中时自动补上
       if (!this.isDashboard(first)) {
         matched = [{ path: '/dashboard', meta: { title: '首页' }}].concat(matched)
       }
@@ -45,8 +46,8 @@ export default {
       }
       return name.trim().toLocaleLowerCase() === 'Dashboard'.toLocaleLowerCase()
     },
+    // 编译路径中的参数，如 /user/:id
     pathCompile(path) {
-      // To solve this problem https://github.com/PanJiaChen/vue-element-admin/issues/561
       const { params } = this.$route
       var toPath = pathToRegexp.compile(path)
       return toPath(params)

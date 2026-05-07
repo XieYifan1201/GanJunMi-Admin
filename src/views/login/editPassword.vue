@@ -9,12 +9,13 @@
     <router-link to="/dashboard">
       <el-button>返回首页</el-button>
     </router-link>
-    <el-button type="primary" style="margin-left: 20px;" @click="submitForm('form')">确定修改</el-button>
+    <el-button type="primary" style="margin-left: 20px;" @click="submitForm">确定修改</el-button>
   </div>
 </template>
 
 <script>
 import { editPwd } from '@/api/user'
+
 export default {
   data() {
     return {
@@ -30,26 +31,22 @@ export default {
     }
   },
   methods: {
-    // 上传表单
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+    // 提交密码修改，成功后自动退出登录
+    submitForm() {
+      this.$refs.form.validate((valid) => {
         if (valid) {
-          if (formName === 'form') {
-            editPwd({
-              password: this.form.password
-            }).then(res => {
-              if (res.code === 1) {
-                this.$message({
-                  type: 'success',
-                  message: '密码修改成功'
-                })
-                this.$store.dispatch('user/logout')
-                this.$router.push(`/login`)
-              }
-            })
-          }
-        } else {
-          return false
+          editPwd({
+            password: this.form.password
+          }).then(res => {
+            if (res.code === 1) {
+              this.$message({
+                type: 'success',
+                message: '密码修改成功'
+              })
+              this.$store.dispatch('user/logout')
+              this.$router.push(`/login`)
+            }
+          })
         }
       })
     }

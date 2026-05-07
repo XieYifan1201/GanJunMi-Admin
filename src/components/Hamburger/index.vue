@@ -1,4 +1,5 @@
 <template>
+  <!-- 侧边栏折叠/展开按钮 -->
   <div style="padding: 0 15px;" @click="toggleClick">
     <svg
       :class="{'is-active':isActive}"

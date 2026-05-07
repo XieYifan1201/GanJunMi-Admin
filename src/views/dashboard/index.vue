@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <!-- 统计卡片区域 -->
     <div class="statistics">
       <el-card v-for="item in statistics" :key="item.label" class="box-card">
         <div slot="header" class="clearfix">
@@ -9,6 +10,8 @@
         <div class="text">{{ item.value }}</div>
       </el-card>
     </div>
+
+    <!-- 柱状图区域 -->
     <div class="charts">
       <div ref="barChart" style="width: 100%; height: 400px;" />
     </div>
@@ -19,9 +22,11 @@
 import * as echarts from 'echarts'
 import { getPhaseList, getclass } from '@/api/trains'
 import { getStuList } from '@/api/student'
+
 export default {
   data() {
     return {
+      // 首页统计项，分别对应开设培训、开设期数、学员总数
       statistics: [
         { label: '开设培训', value: 0, icon: 'el-icon-s-claim' },
         { label: '开设期数', value: 0, icon: 'el-icon-s-goods' },
@@ -36,8 +41,8 @@ export default {
     this.initbarChart()
   },
   methods: {
+    // 获取统计数据：培训数量、期数数量、学员数量
     getData() {
-      // 获取期数数量
       getPhaseList({
         'page': 1,
         'pageSize': 99999999,
@@ -45,7 +50,7 @@ export default {
       }).then(res => {
         this.statistics[0].value = res.data.total
       })
-      // 获取学员数量
+
       getStuList({
         'page': 1,
         'pageSize': 99999999
@@ -53,6 +58,8 @@ export default {
         this.statistics[2].value = res.data.total
       })
     },
+
+    // 初始化柱状图，展示各培训班报名人数
     initbarChart() {
       const chart = echarts.init(this.$refs.barChart)
       const option = {
@@ -73,11 +80,14 @@ export default {
           data: []
         }]
       }
+
       getclass({
         'page': 1,
         'pageSize': 99999999
       }).then(res => {
+        // 同时更新期数统计
         this.statistics[1].value = res.data.total
+        // 取最近20条数据显示在图表中
         res.data.records.slice(-20).map(item => {
           option.xAxis.data.push(`${item.trainsTitle}-${item.trainsClassName}`)
           option.series[0].data.push(item.count)

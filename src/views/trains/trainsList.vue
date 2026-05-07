@@ -1,14 +1,19 @@
 <template>
   <div class="app-container">
+    <!-- 培训筛选 -->
     <div class="btn">
       <p>培训名称：</p>
       <el-select v-model="value" placeholder="请选择培训" @change="selectChange">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </div>
+
+    <!-- 操作按钮 -->
     <div class="btn" style="margin-top: 20px;">
       <el-button type="primary" :disabled="!value" @click="openDialog('dialog1')">新增班次</el-button>
     </div>
+
+    <!-- 班次列表 -->
     <el-table
       v-loading="listLoading"
       class="table"
@@ -62,7 +67,7 @@
       </el-table-column>
     </el-table>
 
-    <!-- 新增 -->
+    <!-- 新增班次弹窗 -->
     <el-dialog title="新增培训期数" :visible.sync="dialogVisible1" width="50%" @close="resetForm('form1')">
       <el-form ref="form1" :model="form1" :rules="formRules">
         <el-form-item label="培训名称" :label-width="labelWidth">
@@ -86,7 +91,7 @@
       </el-form>
     </el-dialog>
 
-    <!-- 编辑 -->
+    <!-- 编辑班次弹窗 -->
     <el-dialog title="编辑班次" :visible.sync="dialogVisible2" width="50%" @close="resetForm('form2')">
       <el-form ref="form2" :model="form2" :rules="formRules">
         <el-form-item label="培训期数" :label-width="labelWidth" prop="trainsClassName">
@@ -105,6 +110,7 @@
       </el-form>
     </el-dialog>
 
+    <!-- 报名人员列表弹窗 -->
     <el-dialog title="报名人员" :visible.sync="dialogVisible3" width="75%">
       <el-table
         class="table"
@@ -154,7 +160,6 @@
         <el-button style="margin-top: 20px;" @click="dialogVisible3 = false">关闭</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
@@ -166,16 +171,18 @@ import * as XLSX from 'xlsx'
 export default {
   data() {
     return {
+      // 班次列表数据
       list: [],
       listLoading: false,
-      // 输入框宽度
+      // 表单标签宽度
       labelWidth: '120px',
-      // 弹出框状态
+      // 弹窗显示状态
       dialogVisible1: false,
       dialogVisible2: false,
       dialogVisible3: false,
+      // 编辑时的日期范围（单独绑定，因为form2的date字段用于校验）
       date: '',
-      // 文本框内容
+      // 新增班次表单
       form1: {
         trainsClassName: '',
         startDate: '',
@@ -183,8 +190,9 @@ export default {
         amount: '',
         date: ''
       },
+      // 编辑班次表单
       form2: {},
-      // 表单验证
+      // 表单校验规则
       formRules: {
         trainsTitle: [
           { required: true, message: '请选择培训名称', trigger: 'blur' }
@@ -199,10 +207,11 @@ export default {
           { required: true, message: '请输入培训日期', trigger: 'blur' }
         ]
       },
-      // 多选框
+      // 培训下拉选项
       options: [],
+      // 当前选中的培训ID
       value: '',
-      // 学员列表
+      // 报名学员列表
       stuList: []
     }
   },
@@ -210,7 +219,7 @@ export default {
     this.getPhase()
   },
   methods: {
-    // 获取所有期次
+    // 获取所有培训，填充下拉选项
     getPhase() {
       this.options = []
       getPhaseList({
@@ -228,11 +237,13 @@ export default {
         this.selectChange()
       })
     },
-    // 期数选择框
+
+    // 培训选择变化时，重新加载班次列表
     selectChange() {
       this.getData(this.value)
     },
-    // 查询
+
+    // 根据培训ID查询班次列表
     getData(id) {
       this.listLoading = true
       getTrains({
@@ -242,11 +253,13 @@ export default {
         this.listLoading = false
       })
     },
-    // 重置弹窗表单
+
+    // 重置表单
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    // 开启弹窗
+
+    // 打开弹窗：dialog1新增，dialog2编辑，dialog3查看报名人员
     openDialog(dialog, trains) {
       if (dialog === 'dialog1') {
         this.dialogVisible1 = true
@@ -260,7 +273,8 @@ export default {
         this.dialogVisible3 = true
       }
     },
-    // 获取学员列表
+
+    // 获取某班次的报名学员列表
     getStu(id) {
       getStudents({
         'page': 1,
@@ -271,7 +285,8 @@ export default {
         this.stuList = res.data.records
       })
     },
-    // 导出excel
+
+    // 导出学员信息为Excel
     exportExcel(id, name) {
       getStudents({
         'page': 1,
@@ -281,6 +296,7 @@ export default {
         'areaReverse': true
       }).then(res => {
         const data = res.data.records
+        // 过滤掉不需要导出的字段
         const newData = data.map(({ studentCertificateId, studentId, duties, image, special_content, date, pay, certificate, ...rest }) => rest)
         const worksheet = XLSX.utils.json_to_sheet(newData)
         const workbook = XLSX.utils.book_new()
@@ -288,12 +304,14 @@ export default {
         XLSX.writeFile(workbook, `${name}学员信息.xlsx`)
       })
     },
-    // 确认按钮
+
+    // 提交表单，根据表单名区分新增和编辑
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           const formData = this[formName]
           if (formName === 'form1') {
+            // 日期转字符串，加8小时修正时区
             formData.startDate = new Date(new Date(formData.date[0]).getTime() + 8 * 3600 * 1000).toISOString().split('T')[0]
             formData.endDate = new Date(new Date(formData.date[1]).getTime() + 8 * 3600 * 1000).toISOString().split('T')[0]
             formData.trainsInfoId = this.value
@@ -325,7 +343,8 @@ export default {
         }
       })
     },
-    // 删除
+
+    // 删除班次
     del(id, name) {
       this.$confirm(`此操作将永久删除${name}, 是否继续?`, '警告', {
         confirmButtonText: '确定',
@@ -347,7 +366,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .table {
   margin-top: 20px;
 }

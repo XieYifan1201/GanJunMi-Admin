@@ -1,5 +1,6 @@
 <template>
   <div v-if="!item.hidden">
+    <!-- 只有一个可见子路由时直接渲染菜单项 -->
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
@@ -8,6 +9,7 @@
       </app-link>
     </template>
 
+    <!-- 多个子路由时渲染子菜单 -->
     <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
         <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
@@ -36,7 +38,6 @@ export default {
   components: { Item, AppLink },
   mixins: [FixiOSBug],
   props: {
-    // route object
     item: {
       type: Object,
       required: true
@@ -51,36 +52,35 @@ export default {
     }
   },
   data() {
-    // To fix https://github.com/PanJiaChen/vue-admin-template/issues/237
-    // TODO: refactor with render function
     this.onlyOneChild = null
     return {}
   },
   methods: {
+    // 判断是否只有一个可见子路由
     hasOneShowingChild(children = [], parent) {
       const showingChildren = children.filter(item => {
         if (item.hidden) {
           return false
         } else {
-          // Temp set(will be used if only has one showing child)
           this.onlyOneChild = item
           return true
         }
       })
 
-      // When there is only one child router, the child router is displayed by default
+      // 只有一个可见子路由时直接展示
       if (showingChildren.length === 1) {
         return true
       }
 
-      // Show parent if there are no child router to display
+      // 无可见子路由时展示父级本身
       if (showingChildren.length === 0) {
-        this.onlyOneChild = { ... parent, path: '', noShowingChildren: true }
+        this.onlyOneChild = { ...parent, path: '', noShowingChildren: true }
         return true
       }
 
       return false
     },
+    // 拼接完整路由路径
     resolvePath(routePath) {
       if (isExternal(routePath)) {
         return routePath

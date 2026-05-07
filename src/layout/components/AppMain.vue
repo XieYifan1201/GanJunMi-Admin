@@ -19,19 +19,18 @@ export default {
 
 <style scoped>
 .app-main {
-  /*50 = navbar  */
   min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
   overflow: hidden;
 }
-.fixed-header+.app-main {
+.fixed-header + .app-main {
   padding-top: 50px;
 }
 </style>
 
 <style lang="scss">
-// fix css style bug in open el-dialog
+// 修复弹窗打开时固定头部右侧内边距问题
 .el-popup-parent--hidden {
   .fixed-header {
     padding-right: 15px;

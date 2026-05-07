@@ -1,7 +1,6 @@
 <template>
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
       <div class="title-container">
         <h3 class="title">赣军密后台管理系统</h3>
       </div>
@@ -42,7 +41,6 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
-
     </el-form>
   </div>
 </template>
@@ -90,6 +88,7 @@ export default {
     }
   },
   methods: {
+    // 切换密码明文/密文显示
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -100,23 +99,17 @@ export default {
         this.$refs.password.focus()
       })
     },
-    // 处理登录请求
+    // 提交登录表单
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          // 加载中
           this.loading = true
-          // 调用store
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
-            // 关闭加载中
             this.loading = false
           }).catch(() => {
             this.loading = false
           })
-        } else {
-          console.log('error submit!!')
-          return false
         }
       })
     }
@@ -125,11 +118,8 @@ export default {
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
 $bg: #E5E5E5;
-$light_gray:#000;
+$light_gray: #000;
 $cursor: #000;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -138,7 +128,6 @@ $cursor: #000;
   }
 }
 
-/* reset element-ui css */
 .login-container {
   .el-input {
     display: inline-block;
@@ -172,10 +161,9 @@ $cursor: #000;
 </style>
 
 <style lang="scss" scoped>
-// $bg:#2d3a4b;
-$bg:#c3272b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #c3272b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 
 .login-container {
   min-height: 100%;
@@ -208,7 +196,6 @@ $light_gray:#eee;
     max-width: 100%;
     margin: 200px auto 0;
     overflow: hidden;
-    position: relative;
     z-index: 2;
     background: white;
   }

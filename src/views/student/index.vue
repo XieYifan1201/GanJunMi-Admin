@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <!-- 搜索栏 -->
     <div class="btn">
       <el-input v-model="name" placeholder="请输入姓名" style="width: 150px;" />
       <el-input v-model="idCard" placeholder="请输入身份证号" style="margin-left: 20px; width: 250px;" />
@@ -30,11 +31,15 @@
       </el-select>
       <el-button type="primary" style="margin-left: 20px;" @click="search()">查询</el-button>
     </div>
+
+    <!-- 操作按钮 -->
     <div class="btn" style="margin-top: 20px;">
       <el-button type="primary" :disabled="selectList.length <= 0" @click="exportExcel()">导出Excel</el-button>
       <el-button type="primary" :disabled="selectList.length <= 0 || selectList.length > 1" @click="openDialog('dialog3')">修改</el-button>
       <el-button type="danger" :disabled="selectList.length <= 0 || selectList.length > 1" @click="del()">删除</el-button>
     </div>
+
+    <!-- 学员列表 -->
     <el-table
       v-loading="listLoading"
       class="table"
@@ -104,6 +109,7 @@
       </el-table-column>
     </el-table>
 
+    <!-- 分页 -->
     <el-pagination
       background
       style="margin-top: 20px;"
@@ -114,11 +120,13 @@
       @current-change="handlePageChange"
       @size-change="handleSizeChange"
     />
-    <!-- 证件照 -->
+
+    <!-- 证件照弹窗 -->
     <el-dialog title="证件照" :visible.sync="dialogVisible2" width="20%">
       <img :src="img" alt="img" style="width: 100%;">
     </el-dialog>
-    <!-- 修改学员信息 -->
+
+    <!-- 修改学员信息弹窗 -->
     <el-dialog title="修改学员信息" :visible.sync="dialogVisible3" width="50%" @close="resetForm('form3')">
       <el-form ref="form3" :model="form3" :rules="formRules2">
         <el-form-item label="姓名" :label-width="labelWidth" prop="name">
@@ -172,21 +180,19 @@ import * as XLSX from 'xlsx'
 export default {
   data() {
     return {
-      // 上传图片token
+      // 上传请求头，携带token鉴权
       header: { 'token': getToken() },
-      // 学员列表
+      // 学员列表数据
       list: [],
-      // 加载
       listLoading: false,
-      // 分页器
+      // 分页
       total: 0,
       pageSize: 10,
-      // 输入框宽度
+      // 表单标签宽度
       labelWidth: '120px',
-      // 弹出框状态
+      // 弹窗显示状态
       dialogVisible2: false,
       dialogVisible3: false,
-      dialogVisible5: false,
       img: '',
       // 修改表单
       form3: {
@@ -198,7 +204,7 @@ export default {
         workUnit: '',
         image: ''
       },
-      // 表单验证
+      // 表单校验规则
       formRules2: {
         trainsId: [
           { required: true, message: '请选择培训', trigger: 'blur' }
@@ -227,11 +233,12 @@ export default {
           { required: true, message: '请上传证件照', trigger: 'blur' }
         ]
       },
-      // 报名列表
+      // 多选选中的学员
       selectList: [],
-      // 期数查询选择
+      // 培训/期数下拉选项
       trainsOptions: [{ value: '', label: '所有培训' }],
       trainsOptions2: [{ value: '', label: '所有期数' }],
+      // 地区下拉选项
       cityOptions: [
         { value: '', label: '所有地区' },
         { value: '南昌市', label: '南昌市' },
@@ -246,7 +253,7 @@ export default {
         { value: '新余市', label: '新余市' },
         { value: '鹰潭市', label: '鹰潭市' }
       ],
-      // 查询内容
+      // 搜索条件
       name: '',
       trainsId: '',
       trainsId2: '',
@@ -260,7 +267,7 @@ export default {
     this.getPhase()
   },
   methods: {
-    // 查询期次
+    // 获取培训列表，填充下拉选项
     getPhase() {
       this.trainsOptions = [{ value: '', label: '所有培训' }]
       getPhaseList({
@@ -273,6 +280,8 @@ export default {
         })
       })
     },
+
+    // 培训变化时，加载对应的期数
     getTrain() {
       this.trainsOptions2 = [{ value: '', label: '所有期数' }]
       getTrains({ id: this.trainsId }).then(res => {
@@ -281,7 +290,8 @@ export default {
         })
       })
     },
-    // 分页查询
+
+    // 分页查询学员列表
     fetchData(page = 1) {
       this.listLoading = true
       getStuList({
@@ -300,19 +310,24 @@ export default {
         this.listLoading = false
       })
     },
-    // 切换页
+
+    // 翻页
     handlePageChange(page) {
       this.fetchData(page)
     },
+
+    // 切换每页条数
     handleSizeChange(pageSize) {
       this.pageSize = pageSize
       this.fetchData()
     },
-    // 重置弹窗表单
+
+    // 重置表单
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    // 开启弹窗
+
+    // 打开弹窗：dialog2查看证件照，dialog3修改学员信息
     openDialog(dialog, data) {
       if (dialog === 'dialog2') {
         this.img = data
@@ -323,6 +338,8 @@ export default {
         this.form3 = cloneDeep(this.selectList[0])
       }
     },
+
+    // 提交修改表单
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -330,10 +347,7 @@ export default {
           if (formName === 'form3') {
             editStuList(formData).then(res => {
               this.dialogVisible3 = false
-              this.$message({
-                type: 'success',
-                message: '修改成功!'
-              })
+              this.$message({ type: 'success', message: '修改成功!' })
               this.resetForm(formName)
               this.fetchData()
             })
@@ -343,13 +357,15 @@ export default {
         }
       })
     },
-    // 选择用户
+
+    // 多选变化
     handleSelectionChange(e) {
       this.selectList = []
       e.map(item => {
         this.selectList.push(item)
       })
     },
+
     // 删除学员
     del() {
       this.$confirm(`此操作将永久删除${this.selectList[0].name}, 是否继续?`, '警告', {
@@ -360,25 +376,21 @@ export default {
         delStuList({
           id: this.selectList[0].id
         }).then(res => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
+          this.$message({ type: 'success', message: '删除成功!' })
           this.fetchData()
         })
       })
     },
-    // 头像上传成功
+
+    // 证件照上传成功回调
     handleAvatarSuccess(res, file) {
       if (res.code === 0) {
-        this.$message({
-          'type': 'error',
-          'message': res.msg
-        })
+        this.$message({ 'type': 'error', 'message': res.msg })
       }
       this.form.image = res.data
       this.form3.image = res.data
     },
+
     // 搜索
     search() {
       this.page = 1
@@ -397,7 +409,8 @@ export default {
         this.listLoading = false
       })
     },
-    // 导出excel
+
+    // 导出选中学员为Excel
     exportExcel() {
       const data = this.selectList
       const worksheet = XLSX.utils.json_to_sheet(data)
@@ -405,6 +418,7 @@ export default {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
       XLSX.writeFile(workbook, '学员信息.xlsx')
     },
+
     // 下载回执单
     download(url) {
       window.open(url)
@@ -413,7 +427,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .table {
   margin-top: 20px;
 }
@@ -425,6 +439,7 @@ export default {
 .dialog-footer {
   text-align: right;
 }
+
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -432,9 +447,11 @@ export default {
   position: relative;
   overflow: hidden;
 }
+
 .avatar-uploader .el-upload:hover {
   border-color: #409EFF;
 }
+
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
@@ -443,6 +460,7 @@ export default {
   line-height: 250px;
   text-align: center;
 }
+
 .avatar {
   width: 180px;
   height: 250px;

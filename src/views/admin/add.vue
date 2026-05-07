@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <!-- 新增管理员表单 -->
     <el-form ref="form" :model="form" class="form" :rules="formRules">
       <el-form-item label="姓名" prop="name">
         <el-input v-model="form.name" autocomplete="off" placeholder="请输入姓名" />
@@ -13,7 +14,7 @@
       <el-form-item label="身份证号" prop="idCard">
         <el-input v-model="form.idCard" autocomplete="off" placeholder="请输入身份证号" />
       </el-form-item>
-      <el-form-item label="性别" prop="roleId">
+      <el-form-item label="性别" prop="sex">
         <el-radio v-model="form.sex" label="男">男</el-radio>
         <el-radio v-model="form.sex" label="女">女</el-radio>
       </el-form-item>
@@ -32,13 +33,16 @@
 
 <script>
 import { addAdmin } from '@/api/admin'
+
 export default {
   data() {
     return {
+      // 表单数据
       form: {
         sex: '男',
         roleId: '2'
       },
+      // 表单验证规则
       formRules: {
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' }
@@ -65,18 +69,17 @@ export default {
     }
   },
   methods: {
+    // 提交新增管理员表单
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          if (formName === 'form') {
-            addAdmin(this.form).then(res => {
-              this.$message({
-                type: 'success',
-                message: '添加成功!'
-              })
-              this.form = {}
+          addAdmin(this.form).then(res => {
+            this.$message({
+              type: 'success',
+              message: '添加成功!'
             })
-          }
+            this.form = {}
+          })
         } else {
           return false
         }
@@ -87,42 +90,12 @@ export default {
 </script>
 
 <style>
-.table {
-  margin-top: 20px;
-}
-
-.btn {
-  display: flex;
+.form {
+  margin: 50px auto 0;
+  width: 60%;
 }
 
 .dialog-footer {
   text-align: right;
-}
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409EFF;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 180px;
-  height: 250px;
-  line-height: 250px;
-  text-align: center;
-}
-.avatar {
-  width: 180px;
-  height: 250px;
-  display: block;
-}
-.form {
-  margin: 50px auto 0;
-  width: 60%;
 }
 </style>

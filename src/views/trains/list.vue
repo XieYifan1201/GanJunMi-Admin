@@ -1,9 +1,11 @@
 <template>
   <div class="app-container">
+    <!-- 操作按钮 -->
     <div class="btn">
       <el-button type="primary" @click="openDialog('dialog1')">新增</el-button>
     </div>
 
+    <!-- 培训列表 -->
     <el-table
       v-loading="listLoading"
       class="table"
@@ -63,6 +65,7 @@
       </el-table-column>
     </el-table>
 
+    <!-- 分页 -->
     <el-pagination
       background
       style="margin-top: 20px;"
@@ -73,7 +76,8 @@
       @current-change="handlePageChange"
       @size-change="handleSizeChange"
     />
-    <!-- 新增 -->
+
+    <!-- 新增培训弹窗 -->
     <el-dialog title="新增培训" :visible.sync="dialogVisible1" width="50%" @close="resetForm('form1')">
       <el-form ref="form1" :model="form1" :rules="formRules">
         <el-form-item label="培训名称" :label-width="labelWidth" prop="trainsTitle">
@@ -98,7 +102,7 @@
       </el-form>
     </el-dialog>
 
-    <!-- 编辑 -->
+    <!-- 编辑培训弹窗 -->
     <el-dialog title="编辑期数" :visible.sync="dialogVisible2" width="50%" @close="resetForm('form2')">
       <el-form ref="form2" :model="form2" :rules="formRules">
         <el-form-item label="培训名称" :label-width="labelWidth" prop="trainsTitle">
@@ -122,7 +126,6 @@
         </div>
       </el-form>
     </el-dialog>
-
   </div>
 </template>
 
@@ -133,17 +136,18 @@ import cloneDeep from 'lodash/cloneDeep'
 export default {
   data() {
     return {
+      // 培训列表数据
       list: [],
       listLoading: false,
+      // 分页
       total: 0,
       pageSize: 20,
-      // 输入框宽度
+      // 表单标签宽度
       labelWidth: '120px',
-      // 弹出框状态
+      // 弹窗显示状态
       dialogVisible1: false,
       dialogVisible2: false,
-      date: '',
-      // 文本框内容
+      // 新增表单
       form1: {
         trainsTitle: '',
         trainsContent: '',
@@ -151,8 +155,9 @@ export default {
         trainsHour: '',
         start: true
       },
+      // 编辑表单（打开弹窗时赋值）
       form2: {},
-      // 表单验证
+      // 表单校验规则
       formRules: {
         trainsTitle: [
           { required: true, message: '请输入培训标题', trigger: 'blur' }
@@ -173,7 +178,7 @@ export default {
     this.fetchData()
   },
   methods: {
-    // 分页查询
+    // 分页查询培训列表
     fetchData(page = 1) {
       this.listLoading = true
       getPhaseList({
@@ -186,19 +191,24 @@ export default {
         this.listLoading = false
       })
     },
-    // 切换页
+
+    // 翻页
     handlePageChange(page) {
       this.fetchData(page)
     },
+
+    // 切换每页条数
     handleSizeChange(pageSize) {
       this.pageSize = pageSize
       this.fetchData()
     },
-    // 重置弹窗表单
+
+    // 重置表单
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    // 开启弹窗
+
+    // 打开弹窗：dialog1新增，dialog2编辑
     openDialog(dialog, trains) {
       if (dialog === 'dialog1') {
         this.dialogVisible1 = true
@@ -207,6 +217,8 @@ export default {
         this.dialogVisible2 = true
       }
     },
+
+    // 提交表单，根据表单名区分新增和编辑
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -238,6 +250,8 @@ export default {
         }
       })
     },
+
+    // 删除培训
     del(id, name) {
       this.$confirm(`此操作将永久删除${name}, 是否继续?`, '警告', {
         confirmButtonText: '确定',
@@ -259,7 +273,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .table {
   margin-top: 20px;
 }

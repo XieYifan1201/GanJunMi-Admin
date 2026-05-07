@@ -1,9 +1,12 @@
 <template>
   <div class="app-container">
-    <div class="btn">
-      <el-button type="primary" :disabled="selectList.length <= 0 || selectList.length > 1" @click="resAdminPwd()">重置密码</el-button>
-      <el-button type="danger" style="margin-left: 20px;" :disabled="selectList.length <= 0 || selectList.length > 1" @click="del()">删除账号</el-button>
+    <!-- 操作按钮 -->
+    <div class="action-bar">
+      <el-button type="primary" :disabled="selectList.length !== 1" @click="resetPassword()">重置密码</el-button>
+      <el-button type="danger" style="margin-left: 20px;" :disabled="selectList.length !== 1" @click="deleteAdmin()">删除账号</el-button>
     </div>
+
+    <!-- 管理员列表 -->
     <el-table
       v-loading="listLoading"
       class="table"
@@ -55,6 +58,7 @@
       </el-table-column>
     </el-table>
 
+    <!-- 分页 -->
     <el-pagination
       background
       style="margin-top: 20px;"
@@ -70,13 +74,18 @@
 
 <script>
 import { getAdminList, delAdmin, resPwd } from '@/api/admin'
+
 export default {
   data() {
     return {
+      // 列表加载状态
       listLoading: false,
+      // 分页相关
       pageSize: 10,
       total: 0,
+      // 管理员列表数据
       list: [],
+      // 当前选中的管理员列表
       selectList: []
     }
   },
@@ -84,7 +93,7 @@ export default {
     this.fetchData()
   },
   methods: {
-    // 分页查询
+    // 分页查询管理员列表
     fetchData(page = 1) {
       this.listLoading = true
       getAdminList({
@@ -96,24 +105,28 @@ export default {
         this.total = res.data.total
       })
     },
-    // 切换页
+
+    // 切换页码
     handlePageChange(page) {
       this.fetchData(page)
     },
+
+    // 切换每页条数
     handleSizeChange(pageSize) {
       this.pageSize = pageSize
       this.fetchData()
     },
-    // 选择用户
-    handleSelectionChange(e) {
+
+    // 表格多选变化
+    handleSelectionChange(selection) {
       this.selectList = []
-      e.map(item => {
+      selection.map(item => {
         this.selectList.push(item)
       })
     },
-    // 删除学员
-    del() {
-      console.log(this.selectList)
+
+    // 删除管理员账号
+    deleteAdmin() {
       this.$confirm(`此操作将删除${this.selectList[0].name}管理员账号, 是否继续?`, '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -130,7 +143,9 @@ export default {
         })
       })
     },
-    resAdminPwd() {
+
+    // 重置管理员密码
+    resetPassword() {
       resPwd({
         id: this.selectList[0].id
       }).then(res => {
@@ -149,34 +164,7 @@ export default {
   margin-top: 20px;
 }
 
-.btn {
+.action-bar {
   display: flex;
-}
-
-.dialog-footer {
-  text-align: right;
-}
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409EFF;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 180px;
-  height: 250px;
-  line-height: 250px;
-  text-align: center;
-}
-.avatar {
-  width: 180px;
-  height: 250px;
-  display: block;
 }
 </style>

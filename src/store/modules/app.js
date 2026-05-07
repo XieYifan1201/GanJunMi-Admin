@@ -1,10 +1,12 @@
 import Cookies from 'js-cookie'
 
 const state = {
+  // 侧边栏状态
   sidebar: {
     opened: Cookies.get('sidebarStatus') ? !!+Cookies.get('sidebarStatus') : true,
     withoutAnimation: false
   },
+  // 当前设备类型
   device: 'desktop'
 }
 

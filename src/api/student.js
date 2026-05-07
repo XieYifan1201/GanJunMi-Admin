@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 
+// 分页查询学员列表（含培训信息）
 export function getStuList(data) {
   return request({
     url: '/api/student/getByBatch2',
@@ -7,6 +8,8 @@ export function getStuList(data) {
     data
   })
 }
+
+// 分页查询学员列表（基础信息）
 export function getStuList2(data) {
   return request({
     url: '/api/student/getByBatch1',
@@ -15,6 +18,7 @@ export function getStuList2(data) {
   })
 }
 
+// 新增或修改学员发票信息
 export function editInvoice(data) {
   return request({
     url: '/api/invoice/addOrUpdateInvoice?idCard=' + data.idCard,
@@ -23,6 +27,7 @@ export function editInvoice(data) {
   })
 }
 
+// 根据身份证号查询发票信息
 export function getInvoice(params) {
   return request({
     url: '/api/invoice/getInvoiceByIdCard',
@@ -31,6 +36,7 @@ export function getInvoice(params) {
   })
 }
 
+// 删除学员
 export function delStuList(params) {
   return request({
     url: '/api/student/delete',
@@ -39,6 +45,7 @@ export function delStuList(params) {
   })
 }
 
+// 修改学员信息
 export function editStuList(data) {
   return request({
     url: '/api/student/update',
@@ -47,6 +54,7 @@ export function editStuList(data) {
   })
 }
 
+// 新增学员
 export function addStuList(data) {
   return request({
     url: '/api/student/add',
@@ -55,6 +63,7 @@ export function addStuList(data) {
   })
 }
 
+// 管理员代学员报名（更新签到状态）
 export function regStu(data) {
   return request({
     url: '/api/student/SAUpdateSign',
@@ -63,6 +72,7 @@ export function regStu(data) {
   })
 }
 
+// 学员自主报名
 export function regStu2(data) {
   return request({
     url: '/api/student/sign',
@@ -71,6 +81,7 @@ export function regStu2(data) {
   })
 }
 
+// 批量设置学员缴费状态
 export function setPay(data) {
   return request({
     url: '/api/student/updatePayStatus',

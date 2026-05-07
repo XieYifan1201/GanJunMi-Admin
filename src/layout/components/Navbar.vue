@@ -1,7 +1,6 @@
 <template>
   <div class="navbar">
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
@@ -12,9 +11,7 @@
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/editPassword">
-            <el-dropdown-item>
-              密码修改
-            </el-dropdown-item>
+            <el-dropdown-item>密码修改</el-dropdown-item>
           </router-link>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">登出</span>

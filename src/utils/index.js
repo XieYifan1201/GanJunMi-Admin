@@ -1,12 +1,8 @@
 /**
- * Created by PanJiaChen on 16/11/18.
- */
-
-/**
- * Parse the time to string
- * @param {(Object|string|number)} time
- * @param {string} cFormat
- * @returns {string | null}
+ * 日期格式化工具
+ * @param {(Object|string|number)} time - 时间对象、时间字符串或时间戳
+ * @param {string} cFormat - 格式模板，如 '{y}-{m}-{d} {h}:{i}:{s}'
+ * @returns {string|null} 格式化后的时间字符串
  */
 export function parseTime(time, cFormat) {
   if (arguments.length === 0 || !time) {
@@ -19,11 +15,9 @@ export function parseTime(time, cFormat) {
   } else {
     if ((typeof time === 'string')) {
       if ((/^[0-9]+$/.test(time))) {
-        // support "1548221490638"
         time = parseInt(time)
       } else {
-        // support safari
-        // https://stackoverflow.com/questions/4310953/invalid-date-in-safari
+        // 兼容 Safari 日期解析
         time = time.replace(new RegExp(/-/gm), '/')
       }
     }
@@ -44,17 +38,17 @@ export function parseTime(time, cFormat) {
   }
   const time_str = format.replace(/{([ymdhisa])+}/g, (result, key) => {
     const value = formatObj[key]
-    // Note: getDay() returns 0 on Sunday
-    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value ] }
+    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value] }
     return value.toString().padStart(2, '0')
   })
   return time_str
 }
 
 /**
- * @param {number} time
- * @param {string} option
- * @returns {string}
+ * 友好时间格式化，输出"刚刚"、"x分钟前"等
+ * @param {number} time - 时间戳
+ * @param {string} option - 备用格式模板
+ * @returns {string} 友好时间文本
  */
 export function formatTime(time, option) {
   if (('' + time).length === 10) {
@@ -70,7 +64,6 @@ export function formatTime(time, option) {
   if (diff < 30) {
     return '刚刚'
   } else if (diff < 3600) {
-    // less 1 hour
     return Math.ceil(diff / 60) + '分钟前'
   } else if (diff < 3600 * 24) {
     return Math.ceil(diff / 3600) + '小时前'
@@ -95,8 +88,9 @@ export function formatTime(time, option) {
 }
 
 /**
- * @param {string} url
- * @returns {Object}
+ * 将 URL 查询参数解析为对象
+ * @param {string} url - 包含查询参数的 URL
+ * @returns {Object} 参数键值对
  */
 export function param2Obj(url) {
   const search = decodeURIComponent(url.split('?')[1]).replace(/\+/g, ' ')

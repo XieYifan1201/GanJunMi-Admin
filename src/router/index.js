@@ -1,48 +1,34 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Layout from '@/layout'
 
 Vue.use(Router)
 
-/* Layout */
-import Layout from '@/layout'
-
 /**
- * Note: sub-menu only appear when route children.length >= 1
- * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
- *
- * hidden: true                   if set true, item will not show in the sidebar(default is false)
- * alwaysShow: true               if set true, will always show the root menu
- *                                if not set alwaysShow, when item has more than one children route,
- *                                it will becomes nested mode, otherwise not show the root menu
- * redirect: noRedirect           if set noRedirect will no redirect in the breadcrumb
- * name:'router-name'             the name is used by <keep-alive> (must set!!!)
- * meta : {
-    roles: ['admin','editor']    control the page roles (you can set multiple roles)
-    title: 'title'               the name show in sidebar and breadcrumb (recommend set)
-    icon: 'svg-name'/'el-icon-x' the icon show in the sidebar
-    breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
-    activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
-  }
+ * 路由配置说明：
+ * hidden: true             是否在侧边栏隐藏（默认 false）
+ * alwaysShow: true         是否始终显示根菜单
+ * redirect: noRedirect     面包屑中不产生重定向
+ * name:'router-name'       用于 <keep-alive> 缓存，必须唯一
+ * meta: {
+ *   title: '标题'          侧边栏和面包屑中显示的名称
+ *   icon: 'svg-name'       侧边栏图标
+ *   activeMenu: '/path'    高亮指定侧边栏菜单项
+ * }
  */
 
-/**
- * constantRoutes
- * a base page that does not have permission requirements
- * all roles can be accessed
- */
+// 静态路由，所有角色均可访问
 export const constantRoutes = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
   {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
   },
-
   {
     path: '/',
     component: Layout,
@@ -54,7 +40,6 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'el-icon-s-home' }
     }]
   },
-
   {
     path: '/trains',
     component: Layout,
@@ -82,7 +67,6 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
     path: '/student',
     component: Layout,
@@ -110,7 +94,6 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
     path: '/certificate',
     component: Layout,
@@ -126,7 +109,7 @@ export const constantRoutes = [
       },
       {
         path: 'certificate',
-        name: 'Certificate',
+        name: 'CertificatePage',
         component: () => import('@/views/certificate/index'),
         meta: { title: '学员证书管理', icon: 'el-icon-files' }
       },
@@ -138,7 +121,6 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
     path: '/admin',
     component: Layout,
@@ -148,41 +130,38 @@ export const constantRoutes = [
     children: [
       {
         path: 'add',
-        name: 'Add',
+        name: 'AdminAdd',
         component: () => import('@/views/admin/add.vue'),
         meta: { title: '添加管理员', icon: 'el-icon-setting' }
       },
       {
         path: 'index',
-        name: 'Index',
+        name: 'AdminIndex',
         component: () => import('@/views/admin/index'),
         meta: { title: '管理员列表', icon: 'el-icon-files' }
       }
     ]
   },
-
   {
     path: '/editPassword',
     component: () => import('@/views/login/editPassword'),
     hidden: true
   },
-
-  // 404 page must be placed at the end !!!
+  // 404 兜底路由，必须放在最后
   { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
 
 const router = createRouter()
 
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
+// 重置路由，用于动态路由场景
 export function resetRouter() {
   const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
+  router.matcher = newRouter.matcher
 }
 
 export default router

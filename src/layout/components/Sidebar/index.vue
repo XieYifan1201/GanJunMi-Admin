@@ -36,7 +36,7 @@ export default {
     activeMenu() {
       const route = this.$route
       const { meta, path } = route
-      // if set path, the sidebar will highlight the path you set
+      // 优先使用 meta.activeMenu 指定的高亮路径
       if (meta.activeMenu) {
         return meta.activeMenu
       }

@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
-    <!-- 设置证书信息 -->
+    <!-- 证书模板设置表单 -->
     <el-form ref="form" :model="form" class="form" :rules="formRules">
       <el-form-item label="培训名称">
-        <el-select v-model="id" style="display: block;" placeholder="请选择培训" @change="change">
+        <el-select v-model="id" style="display: block;" placeholder="请选择培训" @change="onPhaseChange">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -37,16 +37,15 @@ import { getPhaseList, setCer, getCer } from '@/api/trains'
 export default {
   data() {
     return {
-      // 期数id
+      // 当前选中的培训期数ID
       id: '',
-      // 班次id
-      trainsId: '',
-      img: '',
-      // 期数证书信息
+      // 证书模板表单数据
       form: {},
+      // 发证日期（单独管理，因为日期选择器返回的是Date对象）
       date: '',
-      // 期数查询选择
+      // 培训期数下拉选项
       options: [],
+      // 表单验证规则
       formRules: {
         title: [
           { required: true, message: '请输入证书标题', trigger: 'blur' }
@@ -61,11 +60,11 @@ export default {
     }
   },
   created() {
-    this.getPhase()
+    this.loadPhaseList()
   },
   methods: {
-    // 查询期次
-    getPhase() {
+    // 加载培训期数列表，填充下拉选项
+    loadPhaseList() {
       this.options = []
       getPhaseList({
         'page': 1,
@@ -77,7 +76,9 @@ export default {
         })
       })
     },
-    change() {
+
+    // 切换培训期数时，加载对应的证书模板信息
+    onPhaseChange() {
       getCer({
         'trainsInfoId': this.id
       }).then(res => {
@@ -87,18 +88,19 @@ export default {
         }
       })
     },
+
+    // 提交证书模板设置
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          if (formName === 'form') {
-            this.form.startDate = new Date(new Date(this.date).getTime() + 8 * 3600 * 1000).toISOString().split('T')[0]
-            setCer(this.form).then(res => {
-              this.$message({
-                type: 'success',
-                message: '修改成功!'
-              })
+          // 日期转换为ISO格式字符串，取日期部分（加8小时修正时区偏移）
+          this.form.startDate = new Date(new Date(this.date).getTime() + 8 * 3600 * 1000).toISOString().split('T')[0]
+          setCer(this.form).then(res => {
+            this.$message({
+              type: 'success',
+              message: '修改成功!'
             })
-          }
+          })
         } else {
           return false
         }
@@ -109,42 +111,12 @@ export default {
 </script>
 
 <style>
-.table {
-  margin-top: 20px;
-}
-
-.btn {
-  display: flex;
+.form {
+  margin: 50px auto 0;
+  width: 60%;
 }
 
 .dialog-footer {
   text-align: right;
-}
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409EFF;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 180px;
-  height: 250px;
-  line-height: 250px;
-  text-align: center;
-}
-.avatar {
-  width: 180px;
-  height: 250px;
-  display: block;
-}
-.form {
-  margin: 50px auto 0;
-  width: 60%;
 }
 </style>

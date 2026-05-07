@@ -1,4 +1,5 @@
 <template>
+  <!-- 外部链接渲染为 <a>，内部链接渲染为 <router-link> -->
   <component :is="type" v-bind="linkProps(to)">
     <slot />
   </component>
@@ -19,10 +20,7 @@ export default {
       return isExternal(this.to)
     },
     type() {
-      if (this.isExternal) {
-        return 'a'
-      }
-      return 'router-link'
+      return this.isExternal ? 'a' : 'router-link'
     }
   },
   methods: {

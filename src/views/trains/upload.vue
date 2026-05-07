@@ -10,15 +10,19 @@
     </el-upload>
   </div>
 </template>
+
 <script>
 import { getToken } from '@/utils/auth'
+
 export default {
   data() {
     return {
+      // 上传请求头，携带token鉴权
       header: { 'token': getToken() }
     }
   },
   methods: {
+    // 上传成功回调
     handleFileSuccess() {
       this.$message({
         type: 'success',
