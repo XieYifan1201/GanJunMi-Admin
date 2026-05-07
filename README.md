@@ -1,6 +1,13 @@
+<div align="center">
+
 # 赣军密后台管理系统
 
+[![Vue](https://img.shields.io/badge/Vue-2.6+-green.svg)](https://vuejs.org/)
+[![Element UI](https://img.shields.io/badge/Element%20UI-2.13+-blue.svg)](https://element.eleme.io/)
+
 基于 Vue 2 + Element UI 的培训管理后台系统，提供培训信息管理、学员报名管理、证书颁发与打印等完整业务流程。
+
+</div>
 
 ## 项目概述
 
