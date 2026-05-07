@@ -180,7 +180,3 @@ npm run lint -- --fix
 | Chrome | Firefox | Safari | Edge |
 | :---: | :---: | :---: | :---: |
 | 最新版 | 最新版 | 最新版 | 最新版 |
-
-## License
-
-[MIT](./LICENSE)
